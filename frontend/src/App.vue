@@ -1,11 +1,15 @@
 <template>
   <v-app>
-    <v-main>
-      <HelloWorld />
-    </v-main>
+   <Header/>
+   <v-parallax src="https://cdn.vuetifyjs.com/images/parallax/material.jpg"></v-parallax>
   </v-app>
 </template>
 
-<script setup>
-  //
+<script>
+ export default {
+   
+ }
 </script>
+
+<style>
+</style>
