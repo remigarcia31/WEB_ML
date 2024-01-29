@@ -4,3 +4,4 @@ models
 .venv
 package.json
 debugger.ipynb
+frontend/package.json
