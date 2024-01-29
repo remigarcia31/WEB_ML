@@ -8,7 +8,6 @@ app = Flask(__name__,
         template_folder = "../frontend/dist")
 
 
-
 @app.route('/')
 def homepage():
     return render_template('index.html')
