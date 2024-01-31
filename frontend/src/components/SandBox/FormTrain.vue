@@ -50,6 +50,7 @@ export default {
       selectLearningTask: null,
       predictionModel: null,
       target: null,
+      imageUrl: null,
       columns: [],
     };
   },
@@ -62,6 +63,27 @@ export default {
         complete: (results) => {
           this.columns = results.meta.fields;
         },
+      });
+    },
+    launchPredict() {
+      this.isLoading = true;
+      this.imageUrl = null;
+      const formData = new FormData();
+      formData.append("csvFile", this.csvFile);
+      fetch("/api/upload", { method: "POST", body: formData }).catch(
+        (error) => {
+          console.error("Error:", error);
+        }
+      );
+      fetch(
+        `/api/predict/${this.csvFile.name}/${this.predictionModel}/${
+          this.selectLearningTask
+        }/${this.target}/${this.splitValue * 10}`
+      ).then((res) => {
+        this.$emit('image-url-changed', res.url);
+        //console.log(res.url)
+        //console.log("Done")
+        this.$emit('loading', false);
       });
     },
   }

@@ -6,7 +6,7 @@ import FormTrain from "./FormTrain.vue";
   <v-container>
     <v-row>
         <v-col>
-            <FormTrain /> 
+            <FormTrain @image-url-changed="handleImageUrlChanged" /> 
         </v-col>
         <v-col>
             <v-card-title>Graph :</v-card-title>
@@ -20,21 +20,37 @@ import FormTrain from "./FormTrain.vue";
                     <img v-if="imageUrl" :src="imageUrl" alt="Prediction plot" />
                 </v-row>
             </v-container>
-            <v-btn>
-                <v-icon>mdi-download</v-icon>
-                Download Model
-            </v-btn>
-            <a :href="imageUrl" download>
-                <v-btn color="primary">
+            <v-container class="d-flex justify-center">
+                <v-btn>
                     <v-icon>mdi-download</v-icon>
-                    Download plot
+                    Download Model
                 </v-btn>
-            </a>
+                <v-spacer />
+                <a :href="imageUrl" download>
+                    <v-btn color="primary">
+                        <v-icon>mdi-download</v-icon>
+                        Download plot
+                    </v-btn>
+                </a>
+            </v-container>
         </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-   
+export default {
+    data() {
+        return {
+            imageUrl: null,
+            isLoading: false,
+        }
+    },
+    methods : {
+        handleImageUrlChanged(newUrl) {
+                this.imageUrl = newUrl;
+                this.isLoading = false;
+        },
+    } 
+}
 </script>
