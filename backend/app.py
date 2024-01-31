@@ -99,6 +99,8 @@ def predict(csvName:str, modelName:str, selectLearningTask:str,target:str,splitv
         fig.savefig(img, format='png')
         img.seek(0)
 
+        model.save_model('models/model.json')
+
         return send_file(img, mimetype='image/png')
     else:
         model.fit(X_train,y_train)
@@ -127,7 +129,10 @@ def predict(csvName:str, modelName:str, selectLearningTask:str,target:str,splitv
         fig.savefig(img, format='png')
         img.seek(0)
 
+        model.save_model('models/model.json')
+        
         return send_file(img, mimetype='image/png')
+    
 
 
 
