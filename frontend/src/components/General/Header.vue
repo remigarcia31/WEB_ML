@@ -18,9 +18,9 @@
 <script>
 export default {
     methods: {
-    navigateTo(routeName) {
-    this.$router.push({ name: routeName });
-    }
+        navigateTo(routeName) {
+            this.$router.push({ name: routeName });
+        }
     }
 }
 </script>
