@@ -28,7 +28,7 @@ def upload():
     if request.method == 'POST':
         csvFile = request.files['csvFile']
         base_path = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(base_path, csvFile.filename)
+        file_path = os.path.join(base_path + "datasets", csvFile.filename)
         csvFile.save(file_path)
     print(csvFile)
     return "File uploaded"

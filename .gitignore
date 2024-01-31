@@ -1,6 +1,6 @@
 node_modules
-datasets
-models
+datasets/*
+models/*
 .venv
 debugger.ipynb
 frontend/package.json
