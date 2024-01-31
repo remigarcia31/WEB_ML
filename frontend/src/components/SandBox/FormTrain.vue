@@ -40,6 +40,7 @@
 </template>
 
 <script>
+import Papa from "papaparse";
 export default {
   data() {
     return {
@@ -52,5 +53,17 @@ export default {
       columns: [],
     };
   },
+  methods: {
+    parseCSV(event) {
+      const file = event.target.files[0];
+      this.csvFile = file;
+      Papa.parse(file, {
+        header: true,
+        complete: (results) => {
+          this.columns = results.meta.fields;
+        },
+      });
+    },
+  }
 };
 </script>
