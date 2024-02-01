@@ -3,7 +3,7 @@
     <v-card-text>Enter the CSV you want :</v-card-text>
     <v-file-input
       v-model="file"
-      accept="*.csv"
+      accept=".csv"
       label="File input"
       name="csvFile"
       @change="parseCSV"
@@ -35,7 +35,7 @@
       :items="columns"
       v-model="target"
     />
-    <v-btn v-if="splitValue" @click="launchPredict">Predict</v-btn>
+    <v-btn v-if="splitValue" @click="launchPredict" :loading="isLoading">Predict</v-btn>
   </form>
 </template>
 
@@ -51,6 +51,7 @@ export default {
       predictionModel: null,
       target: null,
       imageUrl: null,
+      isLoading: false,
       columns: [],
     };
   },
@@ -84,6 +85,7 @@ export default {
         //console.log(res.url)
         //console.log("Done")
         this.$emit('loading', false);
+        this.isLoading = false;
       });
     },
   }

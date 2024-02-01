@@ -51,13 +51,14 @@ def predict(csvName:str, modelName:str, selectLearningTask:str,target:str,splitv
             model = xgb.XGBRegressor()
 
     if modelName.lower() == "adaboost":
+        global isAdaboost
+        isAdaboost = True
         if selectLearningTask.lower() == "classification":
             from sklearn.ensemble import AdaBoostClassifier
             model = AdaBoostClassifier()
         else:
             from sklearn.ensemble import AdaBoostRegressor
             model = AdaBoostRegressor()
-    
 
     # Load data
     base_path = os.path.dirname(os.path.abspath(__file__))
@@ -134,12 +135,21 @@ def predict(csvName:str, modelName:str, selectLearningTask:str,target:str,splitv
 @app.route('/api/savemodel/<string:modelName>')
 def saveModel(modelName: str):
     import os
-
-    base_path = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(base_path + "/models", modelName + ".json")
+    import pickle
 
     global model
-    model.save_model(file_path)
+    global isAdaboost
+
+    if isAdaboost:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(base_path + "/models", modelName + ".pkl")
+        with open(file_path, 'wb') as model_file:
+                    pickle.dump(model, model_file)
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(base_path + "/models", modelName + ".json") 
+        model.save_model(file_path)
+
     return {"message": "Model saved successfully"}
 
 @app.route('/api/csv-files')
