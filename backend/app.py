@@ -152,8 +152,8 @@ def csv_files():
 @app.route('/api/csv-preview/<string:csv_file>')
 def csv_preview(csv_file):
     import pandas as pd
-    df = pd.read_csv(f"backend/datasets/{csv_file}")
-    return df.head(5).to_json(orient='records')
+    df = pd.read_csv(f"./datasets/{csv_file}.csv")
+    return df.to_json(orient='records')
 
 if __name__ == '__main__':
     app.run(port=4000,debug=devmode)

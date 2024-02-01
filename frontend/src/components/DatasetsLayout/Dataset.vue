@@ -24,17 +24,18 @@
           .then((res) => res.json())
           .then((data) => {
             this.csvPreview = data;
-            console.log(data)
             if (data.length > 0) {
-              this.headers = Object.keys(data[0]).map((key) => ({ text: key, value: key }));
+              this.headers = Object.keys(data[0]).map((key) => ({ text: key, value: key, sortable: true }));
             }
           });
       },
-      watch: {
-        selectedCsv() {
-          this.previewCsv();
+    },
+    watch: {
+        selectedCsv(newVal, oldVal) {
+            if (newVal !== oldVal) {
+              this.previewCsv();
+            }
         },
-      },
     },
   };
   </script>

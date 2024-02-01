@@ -2,7 +2,7 @@
     <v-container>
         <v-row>
             <v-col>
-                <DatasetList @selectedCsv="handleCsvSelected" />
+                <DatasetList v-model="selectedCsv"/>
             </v-col>
             <v-col>
                 <Datasets v-bind:selectedCsv="selectedCsv" />
@@ -22,13 +22,14 @@ export default {
     },
     data() {
         return {
-            selectedCsv: null
+            selectedCsv: ''
         };
     },
     methods: {
-        handleCsvSelected(csv) {
-            console.log(csv)
-            this.selectedCsv = csv;
+    },
+    watch : {
+        selectedCsv(csv) {
+            this.selectedCsv = csv.split(".")[0];
         }
     }
 };
