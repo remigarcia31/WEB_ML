@@ -132,6 +132,91 @@ def predict(csvName:str, modelName:str, selectLearningTask:str,target:str,splitv
 
         return send_file(img, mimetype='image/png')
     
+@app.route('/api/predict/<string:csvName>/<string:modelName>/<string:target>/<int:splitvalue>/')
+def predictPretrained(csvName: str, modelName:str, target:str, splitvalue:int):
+    import os
+    import xgboost as xgb
+    import sklearn as sk
+    import pandas as pd
+    from io import BytesIO
+
+    # Load data
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_path + "/datasets",csvName)
+    df = pd.read_csv(file_path)
+
+    # Split data into X and y
+    y = df[target]
+    X = df.drop(target,axis=1)
+
+    # Label Encode Y
+    y = sk.preprocessing.LabelEncoder().fit_transform(y)
+
+    # Split into train and test
+    X_train, X_test, y_train, y_test = sk.model_selection.train_test_split(X, y, test_size=(splitvalue/10), random_state=42)
+
+    # Load model
+    if modelName.lower().endswith(".pkl"):
+        import pickle
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(base_path + "/models",modelName)
+        with open(file_path, 'rb') as file:
+            model = pickle.load(file)
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(base_path + "/models",modelName)
+        model = xgb.XGBRegressor()
+        model.load_model(file_path)
+
+    # Predict
+    y_val_pred = model.predict(X_test)
+
+    # Evaluate
+    try:
+        score = sk.metrics.accuracy_score(y_test,y_val_pred)
+        train = sk.metrics.accuracy_score(y_train,model.predict(X_train))
+
+        # Get results
+        results = model.evals_result()
+
+        # Plot results
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        fig = plt.figure()
+        try:
+            plt.plot(results['validation_0']['mlogloss'], label='Train')
+            plt.plot(results['validation_1']['mlogloss'], label='Test')
+        except:
+            plt.plot(results['validation_0']['rmse'], label='Train')
+            plt.plot(results['validation_1']['rmse'], label='Test')
+        plt.legend()
+        plt.title("Model Accuracy")
+
+        img = BytesIO() 
+        fig.savefig(img, format='png')
+        img.seek(0)
+
+        return send_file(img, mimetype='image/png')
+    except:
+        score = sk.metrics.mean_squared_error(y_test,y_val_pred)
+        train = sk.metrics.mean_squared_error(y_train,model.predict(X_train))
+
+        # Plot results
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        fig = plt.figure()
+        plt.bar(['Training Set', 'Evaluation Set'], [score, train], color=['blue', 'orange'])
+        plt.ylim(0, 1)
+        plt.title("Model Accuracy")
+
+        img = BytesIO() 
+        fig.savefig(img, format='png')
+        img.seek(0)
+
+        return send_file(img, mimetype='image/png')
+
 @app.route('/api/savemodel/<string:modelName>')
 def saveModel(modelName: str):
     import os
@@ -164,6 +249,13 @@ def csv_preview(csv_file):
     import pandas as pd
     df = pd.read_csv(f"./datasets/{csv_file}.csv")
     return df.to_json(orient='records')
+
+@app.route('/api/models')
+def models():
+    import os
+    files = os.listdir("../backend/models/")
+    models = [f for f in files if f.endswith('.pkl') or f.endswith('.json')]
+    return jsonify(models)
 
 if __name__ == '__main__':
     app.run(port=4000,debug=devmode)

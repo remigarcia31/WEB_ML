@@ -1,4 +1,5 @@
 <template>
+  <v-card-title>Training model : </v-card-title>
   <form method="post">
     <v-card-text>Enter the CSV you want :</v-card-text>
     <v-file-input

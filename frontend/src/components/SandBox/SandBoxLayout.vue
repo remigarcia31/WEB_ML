@@ -1,4 +1,5 @@
 <script setup>
+import FormLoad from "./FormLoad.vue";
 import FormTrain from "./FormTrain.vue";
 </script>
 
@@ -6,7 +7,11 @@ import FormTrain from "./FormTrain.vue";
   <v-container>
     <v-row>
         <v-col>
-            <FormTrain @image-url-changed="handleImageUrlChanged" /> 
+            <v-btn @click="currentComponent = currentComponent === 'FormLoad' ? 'FormTrain' : 'FormLoad'">
+                Switch Form
+            </v-btn>
+            <FormLoad v-if="currentComponent === 'FormLoad'" />
+            <FormTrain v-if="currentComponent === 'FormTrain'" @image-url-changed="handleImageUrlChanged" /> 
         </v-col>
         <v-col>
             <v-card-title>Graph :</v-card-title>
@@ -61,6 +66,7 @@ export default {
             isLoading: false,
             dialog: false,
             modelName: '',
+            currentComponent: 'FormLoad',
         }
     },
     methods : {
