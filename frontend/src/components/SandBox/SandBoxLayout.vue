@@ -21,7 +21,7 @@ import FormTrain from "./FormTrain.vue";
                 </v-row>
             </v-container>
             <v-container class="d-flex justify-center">
-                <v-btn>
+                <v-btn @click="dialog = true">
                     <v-icon>mdi-download</v-icon>
                     Download Model
                 </v-btn>
@@ -35,6 +35,21 @@ import FormTrain from "./FormTrain.vue";
             </v-container>
         </v-col>
     </v-row>
+    <v-dialog v-model="dialog" max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Save Model</span>
+        </v-card-title>
+        <v-card-text>
+          <v-text-field v-model="modelName" label="Model Name" />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn color="blue darken-1" text @click="dialog = false">Close</v-btn>
+          <v-btn color="blue darken-1" text @click="saveModel">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -44,9 +59,17 @@ export default {
         return {
             imageUrl: null,
             isLoading: false,
+            dialog: false,
+            modelName: '',
         }
     },
     methods : {
+        saveModel() {
+            fetch(`/api/savemodel/${this.modelName}`).then((res) => {
+                console.log(res);
+                this.dialog = false;
+            });
+        },
         handleImageUrlChanged(newUrl) {
                 this.imageUrl = newUrl;
                 this.isLoading = false;

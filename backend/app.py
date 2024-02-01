@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, jsonify
 import pkg_resources
 
 devmode = True
@@ -41,6 +41,8 @@ def predict(csvName:str, modelName:str, selectLearningTask:str,target:str,splitv
     import pandas as pd
     from io import BytesIO
 
+    global model
+
     # Select model that will be used for training
     if modelName.lower() == "xgboost":
         if selectLearningTask.lower() == "classification":
@@ -59,7 +61,7 @@ def predict(csvName:str, modelName:str, selectLearningTask:str,target:str,splitv
 
     # Load data
     base_path = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(base_path,csvName)
+    file_path = os.path.join(base_path + "/datasets",csvName)
     df = pd.read_csv(file_path)
 
     # Split data into X and y
@@ -99,8 +101,6 @@ def predict(csvName:str, modelName:str, selectLearningTask:str,target:str,splitv
         fig.savefig(img, format='png')
         img.seek(0)
 
-        model.save_model('models/model.json')
-
         return send_file(img, mimetype='image/png')
     else:
         model.fit(X_train,y_train)
@@ -129,12 +129,31 @@ def predict(csvName:str, modelName:str, selectLearningTask:str,target:str,splitv
         fig.savefig(img, format='png')
         img.seek(0)
 
-        model.save_model('models/model.json')
-        
         return send_file(img, mimetype='image/png')
     
+@app.route('/api/savemodel/<string:modelName>')
+def saveModel(modelName: str):
+    import os
 
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_path + "/models", modelName + ".json")
 
+    global model
+    model.save_model(file_path)
+    return {"message": "Model saved successfully"}
+
+@app.route('/api/csv-files')
+def csv_files():
+    import os
+    files = os.listdir("../backend/datasets/")
+    csv_files = [f for f in files if f.endswith('.csv')]
+    return jsonify(csv_files)
+
+@app.route('/api/csv-preview/<string:csv_file>')
+def csv_preview(csv_file):
+    import pandas as pd
+    df = pd.read_csv(f"backend/datasets/{csv_file}")
+    return df.head(5).to_json(orient='records')
 
 if __name__ == '__main__':
     app.run(port=4000,debug=devmode)
